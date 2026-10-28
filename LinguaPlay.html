@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Lingua Play - สนุกกับการเรียนภาษาอังกฤษและจีน</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #FFF9F5;
+      --card-bg: #FFFFFF;
+      --primary: #FF7B54;
+      --primary-light: #FFB26B;
+      --accent-mint: #84DCC6;
+      --accent-lavender: #A594F9;
+      --accent-yellow: #FFD97D;
+      --danger: #FF6B6B;
+      --text-dark: #2D3748;
+      --text-muted: #718096;
+      --border-radius: 20px;
+      --shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.08);
+      --font-main: 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-chinese: 'Noto Sans SC', 'Prompt', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background-color: var(--bg-main);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      overflow-x: hidden;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      background: var(--card-bg);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 30px rgba(0,0,0,0.04);
+      position: relative;
+    }
+
+    /* Top App Bar */
+    header.app-bar {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #F0ECE9;
+      background: #FFFFFF;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .lang-switcher {
+      display: flex;
+      background: #F4F1EA;
+      border-radius: 20px;
+      padding: 4px;
+      cursor: pointer;
+    }
+
+    .lang-btn {
+      padding: 6px 14px;
+      border-radius: 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .lang-btn.active {
+      background: #FFFFFF;
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .user-stats {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .stat-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #FFF5F2;
+      padding: 6px 10px;
+      border-radius: 14px;
+      color: var(--primary);
+    }
+
+    .stat-badge.hp {
+      background: #FFF0F0;
+      color: var(--danger);
+    }
+
+    /* Main Screens */
+    main.screen {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    h2.title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+    }
+
+    p.subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    /* Cards */
+    .card {
+      background: #FFFFFF;
+      border-radius: var(--border-radius);
+      padding: 18px;
+      border: 2px solid #F0ECE9;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .card:active {
+      transform: scale(0.98);
+    }
+
+    .card.primary {
+      background: linear-gradient(135deg, #FFB26B 0%, #FF7B54 100%);
+      color: #FFFFFF;
+      border: none;
+    }
+
+    .card.primary p {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .level-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: rgba(255,255,255,0.25);
+      margin-bottom: 8px;
+    }
+
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .lesson-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      font-size: 0.8rem;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: #EEE9E5;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--accent-mint);
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* Vocab Flashcard Mode */
+    .flashcard {
+      background: #FFFFFF;
+      border: 2px solid #F0ECE9;
+      border-radius: 24px;
+      padding: 24px 20px;
+      text-align: center;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .vocab-character {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: var(--primary);
+      font-family: var(--font-chinese);
+      margin: 10px 0 0;
+    }
+
+    .vocab-phonetic {
+      font-size: 1.15rem;
+      color: var(--accent-lavender);
+      font-weight: 600;
+      background: #F6F4FF;
+      padding: 4px 14px;
+      border-radius: 16px;
+    }
+
+    .vocab-type {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .vocab-meaning {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    .vocab-example-box {
+      background: #F9F8F6;
+      border-radius: 16px;
+      padding: 14px;
+      width: 100%;
+      text-align: left;
+      font-size: 0.9rem;
+      border-left: 4px solid var(--accent-mint);
+      margin-top: 10px;
+    }
+
+    .vocab-example-box .highlight {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .btn-audio {
+      background: #FFF0EB;
+      border: none;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.3rem;
+      margin: 6px 0;
+      transition: transform 0.2s;
+    }
+
+    .btn-audio:active {
+      transform: scale(0.9);
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: 18px;
+      font-family: var(--font-main);
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(255, 123, 84, 0.3);
+    }
+
+    .btn-primary:active {
+      background: #E86A45;
+      transform: translateY(2px);
+    }
+
+    .btn-outline {
+      background: #FFFFFF;
+      border: 2px solid #E2DCD8;
+      color: var(--text-dark);
+    }
+
+    .btn-disabled {
+      background: #E2DDD9;
+      color: #9E9792;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* Exercise Elements */
+    .exercise-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .quiz-opt-btn {
+      padding: 14px 16px;
+      border: 2px solid #EADFD7;
+      background: #FFFFFF;
+      border-radius: 16px;
+      font-size: 1rem;
+      font-family: var(--font-main);
+      font-weight: 500;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.15s;
+    }
+
+    .quiz-opt-btn.selected {
+      border-color: var(--primary);
+      background: #FFF5F2;
+    }
+
+    .quiz-opt-btn.correct {
+      border-color: var(--accent-mint);
+      background: #EAF8F5;
+      color: #127961;
+      font-weight: 600;
+    }
+
+    .quiz-opt-btn.wrong {
+      border-color: var(--danger);
+      background: #FDF1F1;
+      color: #C0392B;
+    }
+
+    /* Word Pairing */
+    .pair-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .pair-btn {
+      padding: 14px 10px;
+      border-radius: 14px;
+      border: 2px solid #E5E0DB;
+      background: #FFF;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pair-btn.active {
+      border-color: var(--primary);
+      background: #FFF0EB;
+    }
+
+    .pair-btn.matched {
+      border-color: var(--accent-mint);
+      background: #E9F9F4;
+      color: #0E7B62;
+      opacity: 0.6;
+      cursor: default;
+    }
+
+    /* Sentence Order Puzzle */
+    .word-slots {
+      min-height: 55px;
+      border-bottom: 2px dashed #D3C9C2;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 4px;
+      margin-bottom: 16px;
+    }
+
+    .word-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .word-tile {
+      padding: 8px 14px;
+      background: #FFFFFF;
+      border: 2px solid #E5DDD7;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+
+    .word-tile.used {
+      opacity: 0.25;
+      pointer-events: none;
+    }
+
+    /* Feedback Banner Modal */
+    .feedback-sheet {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+      border-top-left-radius: 24px;
+      border-top-right-radius: 24px;
+      background: #FFFFFF;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.12);
+      transform: translateY(100%);
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 100;
+    }
+
+    .feedback-sheet.show {
+      transform: translateY(0);
+    }
+
+    .feedback-sheet.correct {
+      background: #F0FAF7;
+      border-top: 4px solid var(--accent-mint);
+    }
+
+    .feedback-sheet.wrong {
+      background: #FFF3F3;
+      border-top: 4px solid var(--danger);
+    }
+
+    .feedback-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .feedback-expl {
+      font-size: 0.85rem;
+      margin-bottom: 14px;
+      color: var(--text-dark);
+    }
+
+    /* Bottom Nav Bar */
+    nav.bottom-nav {
+      height: 64px;
+      border-top: 1px solid #EFEAE6;
+      background: #FFFFFF;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      position: sticky;
+      bottom: 0;
+      z-index: 40;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+    }
+
+    .nav-icon {
+      font-size: 1.25rem;
+    }
+
+    /* Grammar Box */
+    .grammar-card {
+      background: #FFFFFF;
+      border: 1px solid #EADED6;
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .ex-comp {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 8px;
+      font-size: 0.85rem;
+    }
+
+    .ex-comp .correct-tag {
+      color: #0E7B62;
+      background: #EAF8F4;
+      padding: 6px 10px;
+      border-radius: 10px;
+    }
+
+    .ex-comp .wrong-tag {
+      color: #C0392B;
+      background: #FDE8E8;
+      padding: 6px 10px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Top Bar -->
+  <header class="app-bar">
+    <div class="lang-switcher" id="langSwitch">
+      <button class="lang-btn active" data-lang="zh">🇨🇳 จีน</button>
+      <button class="lang-btn" data-lang="en">🇬🇧 อังกฤษ</button>
+    </div>
+    <div class="user-stats">
+      <span class="stat-badge hp" title="หัวใจ">❤️ <span id="userHp">5</span></span>
+      <span class="stat-badge" title="XP ทั้งหมด">⚡ <span id="userXp">0</span></span>
+    </div>
+  </header>
+
+  <!-- Screen 1: Dashboard / Home -->
+  <main id="screenHome" class="screen">
+    <div>
+      <h2 class="title" id="homeGreeting">ยินดีต้อนรับสู่ Lingua Play! 🎉</h2>
+      <p class="subtitle" id="homeSub">เลือกด่านเพื่อเริ่มฝึกฝนภาษาแบบโต้ตอบ</p>
+    </div>
+
+    <!-- Active Continue Card -->
+    <div class="card primary" id="btnContinuePlay">
+      <span class="level-badge" id="currentLevelBadge">HSK 1 (มาตรฐาน 2.0)</span>
+      <h3 style="font-size: 1.25rem; font-weight: 700;" id="currentLessonTitle">บทที่ 1: การทักทายและตัวเลข</h3>
+      <p id="currentLessonDesc">เรียนรู้คำศัพท์ 5 คำ พร้อมแบบฝึกหัดโต้ตอบ 6 รูปแบบ</p>
+      <div class="progress-bar-container" style="background: rgba(255,255,255,0.3);">
+        <div class="progress-bar" id="homeProgressBar" style="background: #FFFFFF; width: 0%;"></div>
+      </div>
+      <div class="lesson-meta" style="color: #FFF; font-weight: 600;">
+        <span id="homeProgressText">ผ่านแล้ว 0/5 คำ</span>
+        <span>เริ่มเรียนต่อ ➔</span>
+      </div>
+    </div>
+
+    <h3 style="font-size: 1.1rem; font-weight: 700; margin-top: 10px;">เส้นทางการเรียนรู้ (Lessons)</h3>
+    <div class="card-list" id="lessonListContainer">
+      <!-- บทเรียนจะถูก Render ด้วย JavaScript -->
+    </div>
+
+    <!-- Review Mistakes Section (ถ้ามีคำที่ตอบผิด) -->
+    <div id="reviewCard" class="card hidden" style="border: 2px dashed var(--danger); background: #FFFBFB;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h4 style="color: var(--danger); font-weight: 700;">🚨 คลังทบทวนข้อผิดพลาด</h4>
+          <p style="font-size: 0.8rem; color: var(--text-muted);" id="mistakesCountLabel">คุณมี 0 คำศัพท์ที่ต้องฝึกซ้ำ</p>
+        </div>
+        <button class="btn btn-outline" id="btnStartMistakesReview" style="width: auto; padding: 6px 14px; font-size: 0.8rem; border-color: var(--danger); color: var(--danger);">ทบทวนเลย</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Screen 2: Vocabulary Presentation Screen -->
+  <main id="screenVocab" class="screen hidden">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);" id="vocabStepIndicator">คำที่ 1/5</span>
+      <button id="btnSkipToQuiz" style="border: none; background: transparent; color: var(--primary); font-weight: 600; cursor: pointer;">ข้ามไปแบบฝึกหัด ➔</button>
+    </div>
+
+    <div class="flashcard">
+      <span class="vocab-type" id="cardVocabType">Noun</span>
+      <div class="vocab-character" id="cardVocabWord">你好</div>
+      <div class="vocab-phonetic" id="cardVocabPhonetic">nǐ hǎo</div>
+      <button class="btn-audio" id="btnPlayVocabAudio" title="ฟังเสียง">🔊</button>
+      <div class="vocab-meaning" id="cardVocabMeaning">สวัสดี</div>
+
+      <div class="vocab-example-box">
+        <p style="font-weight: 600; margin-bottom: 4px;" id="cardExampleTarget">你好！很高兴认识你。</p>
+        <p style="color: var(--text-muted); font-size: 0.85rem;" id="cardExampleTrans">สวัสดี! ยินดีที่ได้รู้จักคุณ</p>
+      </div>
+      <p style="font-size: 0.8rem; color: #8C827A; margin-top: 4px;" id="cardVocabUsageNote">💡 ใช้ทักทายทั่วไปได้ตลอดวัน</p>
+    </div>
+
+    <div style="margin-top: auto; display: flex; gap: 10px;">
+      <button class="btn btn-outline" id="btnPrevVocab">ย้อนกลับ</button>
+      <button class="btn btn-primary" id="btnNextVocab">ถัดไป</button>
+    </div>
+  </main>
+
+  <!-- Screen 3: Interactive Exercise Screen (แบบฝึกหัด 6 แบบ) -->
+  <main id="screenQuiz" class="screen hidden">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <button id="btnCloseQuiz" style="border: none; background: transparent; font-size: 1.2rem; cursor: pointer;">✕</button>
+      <div class="progress-bar-container" style="flex: 1; margin: 0;">
+        <div class="progress-bar" id="quizProgressBar" style="width: 20%;"></div>
+      </div>
+      <span id="quizCounter" style="font-size: 0.85rem; font-weight: 600;">1/6</span>
+    </div>
+
+    <div style="margin-top: 8px;">
+      <span class="level-badge" id="quizBadgeType" style="background: #EAE6FF; color: var(--accent-lavender);">แบบฝึกหัด</span>
+      <h3 class="exercise-title" id="quizInstruction">เลือกคำแปลที่ถูกต้อง</h3>
+    </div>
+
+    <!-- Quiz Content Workspace -->
+    <div id="quizWorkspace" style="display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; width: 100%;">
+      <!-- Workspace ไดนามิกสำหรับแต่ละแบบฝึกหัด -->
+    </div>
+
+    <button class="btn btn-primary btn-disabled" id="btnCheckAnswer" disabled>ตรวจคำตอบ</button>
+  </main>
+
+  <!-- Screen 4: Grammar Screen -->
+  <main id="screenGrammar" class="screen hidden">
+    <h2 class="title">คลังไวยากรณ์ (Grammar Master)</h2>
+    <p class="subtitle" id="grammarSub">สรุปโครงสร้างประโยค เข้าใจง่าย พร้อมตัวอย่างจริง</p>
+
+    <div id="grammarContentList">
+      <!-- Grammar Cards populated by JS -->
+    </div>
+  </main>
+
+  <!-- Feedback Sliding Sheet -->
+  <div class="feedback-sheet" id="feedbackSheet">
+    <div class="feedback-title" id="feedbackTitle">ถูกต้อง! ยอดเยี่ยมมาก ✨</div>
+    <div class="feedback-expl" id="feedbackExplanation">คำอธิบายเพิ่มเติมเกี่ยวกับข้อนี้</div>
+    <button class="btn btn-primary" id="btnFeedbackContinue">ลุยต่อ ➔</button>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-target="screenHome">
+      <span class="nav-icon">📖</span>
+      <span>บทเรียน</span>
+    </button>
+    <button class="nav-item" data-target="screenGrammar">
+      <span class="nav-icon">🧩</span>
+      <span>ไวยากรณ์</span>
+    </button>
+  </nav>
+</div>
+
+<script>
+/**
+ * LINGUA PLAY - CORE APPLICATION LOGIC
+ * สถาปัตยกรรมข้อมูลมาตรฐาน HSK 2.0 (จีน) และ CEFR (อังกฤษ)
+ */
+
+// 1. DATA REPOSITORY: คำศัพท์ ไวยากรณ์ และแบบฝึกหัด
+const APP_DATA = {
+  zh: {
+    languageTitle: "ภาษาจีนกลาง (Mandarin)",
+    standardName: "HSK 2.0 มาตรฐานคำศัพท์ทางการ",
+    speechCode: "zh-CN",
+    lessons: [
+      {
+        id: "zh_hsk1_01",
+        level: "HSK 1",
+        title: "บทที่ 1: การทักทายและสุภาพ",
+        desc: "พื้นฐานสำคัญที่สุดในการเริ่มพูดคุยภาษาจีน",
+        words: [
+          {
+            word: "你好",
+            pinyin: "nǐ hǎo",
+            type: "คำทักทาย",
+            meaning: "สวัสดี",
+            example: "你好！很高兴认识你。",
+            exampleTrans: "สวัสดี! ยินดีที่ได้รู้จักคุณ",
+            note: "ใช้พูดทักทายกับบุคคลทั่วไปได้ตลอดเวลา",
+            icon: "👋"
+          },
+          {
+            word: "谢谢",
+            pinyin: "xièxie",
+            type: "คำกริยา",
+            meaning: "ขอบคุณ",
+            example: "太谢谢你了！",
+            exampleTrans: "ขอบคุณเธอมากๆ เลยนะ!",
+            note: "พยางค์หลังออกเสียงเป็นเสียงเบา (Qingsheng)",
+            icon: "🙏"
+          },
+          {
+            word: "再见",
+            pinyin: "zàijiàn",
+            type: "คำอำลา",
+            meaning: "ลาก่อน / พบกันใหม่",
+            example: "明天见，再见！",
+            exampleTrans: "พรุ่งนี้เจอกัน ลาก่อน!",
+            note: "再 แปลว่า อีกครั้ง, 见 แปลว่า พบ",
+            icon: "🚪"
+          },
+          {
+            word: "对不起",
+            pinyin: "duìbuqǐ",
+            type: "วลี",
+            meaning: "ขอโทษ",
+            example: "对不起，我来晚了。",
+            exampleTrans: "ขอโทษครับ ผมมาสาย",
+            note: "ใช้แสดงความเสียใจหรือขออภัยอย่างเป็นทางการ",
+            icon: "🙇‍♂️"
+          },
+          {
+            word: "不客气",
+            pinyin: "bú kèqi",
+            type: "วลี",
+            meaning: "ไม่เป็นไร / ด้วยความยินดี",
+            example: "A: 谢谢你！ B: 不客气。",
+            exampleTrans: "A: ขอบคุณนะ! B: ไม่เป็นไรครับ",
+            note: "ใช้ตอบรับคำขอบคุณ (谢谢)",
+            icon: "😊"
+          }
+        ]
+      },
+      {
+        id: "zh_hsk2_01",
+        level: "HSK 2",
+        title: "บทที่ 2: ชีวิตประจำวันและการซื้อของ",
+        desc: "คำศัพท์ระดับ HSK 2 สำหรับใช้ในร้านค้าและชีวิตประจำวัน",
+        words: [
+          {
+            word: "买",
+            pinyin: "mǎi",
+            type: "คำกริยา",
+            meaning: "ซื้อ",
+            example: "我想买一个苹果。",
+            exampleTrans: "ฉันอยากซื้อแอปเปิ้ลหนึ่งผล",
+            note: "ระวังอย่าสับสนกับ 卖 (mài) ที่แปลว่า 'ขาย'",
+            icon: "🛒"
+          },
+          {
+            word: "贵",
+            pinyin: "guì",
+            type: "คำคุณศัพท์",
+            meaning: "แพง",
+            example: "太贵了，便宜一点吧！",
+            exampleTrans: "แพงเกินไปแล้ว ลดราคาหน่อยสิ!",
+            note: "เป็นคำชมเชยที่สุภาพได้ เช่น 贵姓 (นามสกุลอันทรงเกียรติ)",
+            icon: "🏷️"
+          }
+        ]
+      }
+    ],
+    grammar: [
+      {
+        level: "HSK 1-2",
+        title: "โครงสร้างประโยคบอกเล่าพื้นฐาน (S + V + O)",
+        explanation: "ภาษาจีนมีโครงสร้างพื้นฐานคล้ายภาษาไทย คือ ประธาน + กริยา + กรรม",
+        correctExample: "我 (ฉัน) + 爱 (รัก) + 你 (คุณ) = ฉันรักคุณ",
+        wrongExample: "我 (ฉัน) + 你 (คุณ) + 爱 (รัก) ❌ (ผิดลำดับคำ)",
+        tip: "สังเกตว่าไม่ต้องผันรูปกริยาตามกาลเวลาเหมือนภาษาอังกฤษ"
+      },
+      {
+        level: "HSK 2",
+        title: "การใช้คำปฏิเสธ 不 (bù) กับ 没 (méi)",
+        explanation: "不 ใช้ปฏิเสธปัจจุบัน อนาคต หรือความเคยชิน ส่วน 没 ใช้ปฏิเสธการกระทำที่ยังไม่เกิดขึ้นหรืออดีต",
+        correctExample: "我不去 (ฉันไม่ไป - ตั้งใจไม่ไป) / 我没去 (ฉันไม่ได้ไป - อดีต)",
+        wrongExample: "我不有钱 ❌ (ห้ามใช้ 不 กับ 有 ให้ใช้ 没有 เสมอ)",
+        tip: "จำง่ายๆ: กริยา 有 (มี) ต้องคู่กับ 没 เท่านั้น"
+      }
+    ]
+  },
+
+  en: {
+    languageTitle: "ภาษาอังกฤษ (English)",
+    standardName: "สอดคล้องกับกรอบมาตรฐาน CEFR A1-C2",
+    speechCode: "en-US",
+    lessons: [
+      {
+        id: "en_a1_01",
+        level: "CEFR A1",
+        title: "Lesson 1: Everyday Greetings & Essentials",
+        desc: "คำศัพท์พื้นฐานสำหรับทักทายและสร้างปฏิสัมพันธ์แรกเริ่ม",
+        words: [
+          {
+            word: "Hello",
+            pinyin: "/həˈloʊ/",
+            type: "interjection",
+            meaning: "สวัสดี",
+            example: "Hello, nice to meet you!",
+            exampleTrans: "สวัสดี ยินดีที่ได้พบคุณ!",
+            note: "คำทักทายสากลที่สุภาพและเป็นมิตร",
+            icon: "👋"
+          },
+          {
+            word: "Delicious",
+            pinyin: "/dɪˈlɪʃəs/",
+            type: "adjective",
+            meaning: "อร่อยมาก",
+            example: "This Thai tea is delicious.",
+            exampleTrans: "ชาไทยแก้วนี้อร่อยมากเลย",
+            note: "มีความหมายเข้มข้นกว่าคำว่า 'Good' เมื่อพูดถึงรสชาติ",
+            icon: "🍲"
+          },
+          {
+            word: "Journey",
+            pinyin: "/ˈdʒɜːrni/",
+            type: "noun",
+            meaning: "การเดินทาง / การผจญภัย",
+            example: "Have a safe journey home!",
+            exampleTrans: "ขอให้เดินทางกลับบ้านโดยสวัสดิภาพนะ!",
+            note: "มักเน้นการเดินทางระยะทางไกลหรือเชิงประสบการณ์",
+            icon: "✈️"
+          },
+          {
+            word: "Inspire",
+            pinyin: "/ɪnˈspaɪər/",
+            type: "verb",
+            meaning: "สร้างแรงบันดาลใจ",
+            example: "Her success will inspire everyone.",
+            exampleTrans: "ความสำเร็จของเธอจะสร้างแรงบันดาลใจให้ทุกคน",
+            note: "เป็นรากศัพท์ของคำนาม Inspiration",
+            icon: "💡"
+          },
+          {
+            word: "Gratitude",
+            pinyin: "/ˈɡrætɪtuːd/",
+            type: "noun",
+            meaning: "ความรู้สึกขอบคุณ / ความซาบซึ้งใจ",
+            example: "She expressed deep gratitude to her teacher.",
+            exampleTrans: "เธอแสดงความซาบซึ้งใจอย่างสุดซึ้งต่อครูของเธอ",
+            note: "คำศัพท์ระดับ A2-B1 เหมาะกับการพูดอย่างเป็นทางการ",
+            icon: "💖"
+          }
+        ]
+      }
+    ],
+    grammar: [
+      {
+        level: "CEFR A1-A2",
+        title: "Present Simple Tense สำหรับกิจวัตร",
+        explanation: "ใช้เล่าเรื่องจริง กฎธรรมชาติ หรือสิ่งที่ทำเป็นประจำ หากประธานเป็นเอกพจน์ (He/She/It) กริยาต้องเติม -s หรือ -es",
+        correctExample: "She drinks coffee every morning.",
+        wrongExample: "She drink coffee every morning. ❌ (ขาดการเติม -s ที่ประธานเอกพจน์)",
+        tip: "จำง่ายๆ: ประธานคนเดียว กริยาเหงาเลยต้องเติม s เป็นเพื่อน"
+      }
+    ]
+  }
+};
+
+// 2. STATE MANAGEMENT & LOCAL STORAGE
+class AppState {
+  constructor() {
+    this.currentLang = localStorage.getItem('lingua_lang') || 'zh';
+    this.xp = parseInt(localStorage.getItem('lingua_xp') || '0', 10);
+    this.hp = parseInt(localStorage.getItem('lingua_hp') || '5', 10);
+    this.completedLessons = JSON.parse(localStorage.getItem('lingua_completed') || '[]');
+    this.mistakesList = JSON.parse(localStorage.getItem('lingua_mistakes') || '[]');
+  }
+
+  save() {
+    localStorage.setItem('lingua_lang', this.currentLang);
+    localStorage.setItem('lingua_xp', this.xp.toString());
+    localStorage.setItem('lingua_hp', this.hp.toString());
+    localStorage.setItem('lingua_completed', JSON.stringify(this.completedLessons));
+    localStorage.setItem('lingua_mistakes', JSON.stringify(this.mistakesList));
+  }
+
+  addXp(points) {
+    this.xp += points;
+    this.save();
+    UI.updateHeaderStats();
+  }
+
+  decrementHp() {
+    if (this.hp > 0) {
+      this.hp -= 1;
+      this.save();
+      UI.updateHeaderStats();
+    }
+  }
+
+  resetHp() {
+    this.hp = 5;
+    this.save();
+    UI.updateHeaderStats();
+  }
+
+  addMistake(vocab) {
+    if (!this.mistakesList.some(m => m.word === vocab.word)) {
+      this.mistakesList.push(vocab);
+      this.save();
+      UI.updateMistakesNotice();
+    }
+  }
+
+  removeMistake(vocabWord) {
+    this.mistakesList = this.mistakesList.filter(m => m.word !== vocabWord);
+    this.save();
+    UI.updateMistakesNotice();
+  }
+}
+
+const state = new AppState();
+
+// 3. AUDIO SYNTHESIS ENGINE (ไม่ต้องพึ่ง API เสียเงิน)
+const AudioEngine = {
+  speak(text, lang) {
+    if (!('speechSynthesis' in window)) {
+      alert("บราวเซอร์ของคุณไม่รองรับ Web Speech API");
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = lang;
+    utterance.rate = 0.85; // ความเร็วเหมาะสมกับการเรียน
+    window.speechSynthesis.speak(utterance);
+  }
+};
+
+// 4. LESSON AND QUIZ RUNTIME CONTROLLER
+const QuizRunner = {
+  lesson: null,
+  exercises: [],
+  currentIndex: 0,
+  currentExercise: null,
+  selectedAnswer: null,
+
+  startLesson(lessonObj) {
+    this.lesson = lessonObj;
+    this.buildExerciseQueue();
+    this.currentIndex = 0;
+    UI.showScreen('screenQuiz');
+    this.renderCurrentExercise();
+  },
+
+  buildExerciseQueue() {
+    const words = [...this.lesson.words];
+    this.exercises = [];
+
+    // รูปแบบ 1: Multiple Choice เลือกความหมาย
+    const w1 = words[0];
+    this.exercises.push({
+      type: 'multiple-choice',
+      badge: 'แบบที่ 1: เลือกความหมาย',
+      instruction: `คำว่า "${w1.word}" (${w1.pinyin}) มีความหมายว่าอย่างไร?`,
+      targetVocab: w1,
+      options: this.shuffle([
+        { text: w1.meaning, isCorrect: true },
+        { text: "ลาก่อน", isCorrect: false },
+        { text: "อร่อย", isCorrect: false },
+        { text: "ขอโทษ", isCorrect: false }
+      ]),
+      explain: `"${w1.word}" แปลว่า "${w1.meaning}" ตัวอย่าง: ${w1.example}`
+    });
+
+    // รูปแบบ 2: Visual Match ดูสัญลักษณ์/ไอคอนแล้วเลือกคำศัพท์
+    const w2 = words[1] || words[0];
+    this.exercises.push({
+      type: 'visual-match',
+      badge: 'แบบที่ 2: ดูภาพแล้วตอบ',
+      instruction: `สัญลักษณ์ "${w2.icon}" ตรงกับคำศัพท์ใด?`,
+      targetVocab: w2,
+      options: this.shuffle([
+        { text: `${w2.word} (${w2.pinyin})`, isCorrect: true },
+        { text: words[0].word, isCorrect: false },
+        { text: "电脑 (diànnǎo)", isCorrect: false },
+        { text: "明天 (míngtiān)", isCorrect: false }
+      ]),
+      explain: `ไอคอน ${w2.icon} หมายถึง "${w2.meaning}" คำศัพท์คือ "${w2.word}"`
+    });
+
+    // รูปแบบ 3: เติมคำในช่องว่าง (Fill in the blanks)
+    const w3 = words[2] || words[0];
+    this.exercises.push({
+      type: 'fill-blank',
+      badge: 'แบบที่ 3: เติมคำในช่องว่าง',
+      instruction: `เลือกคำที่ขาดหายไปในประโยค`,
+      targetVocab: w3,
+      sentenceMasked: `明天见，[ ____ ]！ (พรุ่งนี้เจอกัน, ลาก่อน!)`,
+      options: this.shuffle([
+        { text: w3.word, isCorrect: true },
+        { text: words[0].word, isCorrect: false },
+        { text: "很多", isCorrect: false }
+      ]),
+      explain: `ประโยคที่สมบูรณ์คือ: "明天见，${w3.word}！"`
+    });
+
+    // รูปแบบ 4: Word Pairing จับคู่คำศัพท์
+    this.exercises.push({
+      type: 'word-pair',
+      badge: 'แบบที่ 4: จับคู่คำศัพท์',
+      instruction: 'แตะจับคู่คำศัพท์และความหมายให้ถูกต้องทั้งหมด',
+      targetVocab: words[0],
+      pairs: words.slice(0, 3).map(w => ({ word: w.word, meaning: w.meaning })),
+      explain: 'จับคู่คำศัพท์สำเร็จครบถ้วน!'
+    });
+
+    // รูปแบบ 5: เรียงคำเป็นประโยค (Word Order Puzzle)
+    this.exercises.push({
+      type: 'sentence-order',
+      badge: 'แบบที่ 5: เรียงคำเป็นประโยค',
+      instruction: 'เรียงคำศัพท์ให้เป็นประโยคที่ถูกต้องตามหลักไวยากรณ์',
+      targetVocab: words[0],
+      correctOrder: ["你好", "我", "很高兴", "认识你"],
+      thaiMeaning: "สวัสดี ฉันยินดีมากที่ได้รู้จักคุณ",
+      explain: 'โครงสร้างประโยค: 你好 (ทักทาย) + 我很高兴认识你 (ประธาน + กริยาขยาย)'
+    });
+
+    // รูปแบบ 6: ฟังเสียงแล้วเลือกคำตอบ (Listening)
+    const wAudio = words[0];
+    this.exercises.push({
+      type: 'listening',
+      badge: 'แบบที่ 6: ฟังแล้วเลือกตอบ',
+      instruction: 'กดฟังเสียงอ่านแล้วเลือกคำศัพท์ที่ได้ยิน',
+      targetVocab: wAudio,
+      audioWord: wAudio.word,
+      options: this.shuffle([
+        { text: `${wAudio.word} - ${wAudio.meaning}`, isCorrect: true },
+        { text: "谢谢 (xièxie)", isCorrect: false },
+        { text: "对不起 (duìbuqǐ)", isCorrect: false }
+      ]),
+      explain: `เสียงที่ได้ยินคือ "${wAudio.word}" (${wAudio.pinyin}) แปลว่า ${wAudio.meaning}`
+    });
+  },
+
+  shuffle(arr) {
+    return [...arr].sort(() => Math.random() - 0.5);
+  },
+
+  renderCurrentExercise() {
+    this.currentExercise = this.exercises[this.currentIndex];
+    const total = this.exercises.length;
+    
+    // อัปเดต Progress และ Badge
+    document.getElementById('quizCounter').innerText = `${this.currentIndex + 1}/${total}`;
+    document.getElementById('quizProgressBar').style.width = `${((this.currentIndex + 1) / total) * 100}%`;
+    document.getElementById('quizBadgeType').innerText = this.currentExercise.badge;
+    document.getElementById('quizInstruction').innerText = this.currentExercise.instruction;
+
+    const workspace = document.getElementById('quizWorkspace');
+    workspace.innerHTML = '';
+    UI.setCheckButtonState(false);
+    this.selectedAnswer = null;
+
+    // Render ตามชนิดของ Exercise
+    switch (this.currentExercise.type) {
+      case 'multiple-choice':
+      case 'visual-match':
+      case 'listening':
+        this.renderSelectionExercise(workspace);
+        break;
+      case 'fill-blank':
+        this.renderFillBlankExercise(workspace);
+        break;
+      case 'word-pair':
+        this.renderPairExercise(workspace);
+        break;
+      case 'sentence-order':
+        this.renderSentenceOrderExercise(workspace);
+        break;
+    }
+  },
+
+  renderSelectionExercise(container) {
+    if (this.currentExercise.type === 'listening') {
+      const audioBtn = document.createElement('button');
+      audioBtn.className = 'btn-audio';
+      audioBtn.style.width = '70px';
+      audioBtn.style.height = '70px';
+      audioBtn.style.fontSize = '2rem';
+      audioBtn.style.marginBottom = '20px';
+      audioBtn.innerHTML = '🔊';
+      audioBtn.onclick = () => AudioEngine.speak(this.currentExercise.audioWord, APP_DATA[state.currentLang].speechCode);
+      container.appendChild(audioBtn);
+      // ออกเสียงทันทีอัตโนมัติ
+      setTimeout(() => audioBtn.click(), 300);
+    }
+
+    const optList = document.createElement('div');
+    optList.className = 'quiz-options';
+
+    this.currentExercise.options.forEach((opt, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'quiz-opt-btn';
+      btn.innerHTML = `<span style="font-weight:700; color:var(--text-muted);">${['A','B','C','D'][idx]}.</span> <span>${opt.text}</span>`;
+      btn.onclick = () => {
+        document.querySelectorAll('.quiz-opt-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        this.selectedAnswer = opt;
+        UI.setCheckButtonState(true);
+      };
+      optList.appendChild(btn);
+    });
+
+    container.appendChild(optList);
+  },
+
+  renderFillBlankExercise(container) {
+    const sentenceBox = document.createElement('div');
+    sentenceBox.style.fontSize = '1.2rem';
+    sentenceBox.style.fontWeight = '600';
+    sentenceBox.style.margin = '20px 0';
+    sentenceBox.style.textAlign = 'center';
+    sentenceBox.innerText = this.currentExercise.sentenceMasked;
+    container.appendChild(sentenceBox);
+
+    const optList = document.createElement('div');
+    optList.className = 'quiz-options';
+    this.currentExercise.options.forEach((opt) => {
+      const btn = document.createElement('button');
+      btn.className = 'quiz-opt-btn';
+      btn.innerText = opt.text;
+      btn.onclick = () => {
+        document.querySelectorAll('.quiz-opt-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        this.selectedAnswer = opt;
+        UI.setCheckButtonState(true);
+      };
+      optList.appendChild(btn);
+    });
+    container.appendChild(optList);
+  },
+
+  renderPairExercise(container) {
+    const pairGrid = document.createElement('div');
+    pairGrid.className = 'pair-container';
+    
+    // สร้างแท่นคำศัพท์ปนกัน
+    let leftItems = this.currentExercise.pairs.map(p => ({ text: p.word, key: p.word, type: 'left' }));
+    let rightItems = this.currentExercise.pairs.map(p => ({ text: p.meaning, key: p.word, type: 'right' }));
+    let allTokens = this.shuffle([...leftItems, ...rightItems]);
+
+    let selectedTile = null;
+    let matchedCount = 0;
+    const targetMatches = this.currentExercise.pairs.length;
+
+    allTokens.forEach(token => {
+      const btn = document.createElement('button');
+      btn.className = 'pair-btn';
+      btn.innerText = token.text;
+      btn.onclick = () => {
+        if (btn.classList.contains('matched')) return;
+
+        if (!selectedTile) {
+          selectedTile = { token, element: btn };
+          btn.classList.add('active');
+        } else {
+          if (selectedTile.element === btn) {
+            btn.classList.remove('active');
+            selectedTile = null;
+            return;
+          }
+
+          // ตรวจการจับคู่
+          if (selectedTile.token.type !== token.type && selectedTile.token.key === token.key) {
+            btn.classList.remove('active');
+            btn.classList.add('matched');
+            selectedTile.element.classList.remove('active');
+            selectedTile.element.classList.add('matched');
+            selectedTile = null;
+            matchedCount++;
+
+            if (matchedCount === targetMatches) {
+              this.selectedAnswer = { isCorrect: true };
+              UI.setCheckButtonState(true);
+            }
+          } else {
+            // จับผิดคู่
+            btn.classList.add('wrong');
+            selectedTile.element.classList.add('wrong');
+            setTimeout(() => {
+              btn.classList.remove('wrong', 'active');
+              if (selectedTile) selectedTile.element.classList.remove('wrong', 'active');
+              selectedTile = null;
+            }, 600);
+          }
+        }
+      };
+      pairGrid.appendChild(btn);
+    });
+
+    container.appendChild(pairGrid);
+  },
+
+  renderSentenceOrderExercise(container) {
+    const meaningHint = document.createElement('p');
+    meaningHint.style.fontSize = '0.9rem';
+    meaningHint.style.color = 'var(--text-muted)';
+    meaningHint.style.marginBottom = '8px';
+    meaningHint.innerText = `ความหมาย: "${this.currentExercise.thaiMeaning}"`;
+    container.appendChild(meaningHint);
+
+    const slotContainer = document.createElement('div');
+    slotContainer.className = 'word-slots';
+    container.appendChild(slotContainer);
+
+    const bankContainer = document.createElement('div');
+    bankContainer.className = 'word-bank';
+
+    const wordsToOrder = this.shuffle([...this.currentExercise.correctOrder]);
+    const currentBuiltSentence = [];
+
+    wordsToOrder.forEach((word) => {
+      const tile = document.createElement('div');
+      tile.className = 'word-tile';
+      tile.innerText = word;
+      tile.onclick = () => {
+        if (!tile.classList.contains('used')) {
+          tile.classList.add('used');
+          currentBuiltSentence.push(word);
+
+          // สร้าง token ใน slots
+          const slotTile = document.createElement('div');
+          slotTile.className = 'word-tile';
+          slotTile.innerText = word;
+          slotTile.onclick = () => {
+            slotContainer.removeChild(slotTile);
+            tile.classList.remove('used');
+            const idx = currentBuiltSentence.indexOf(word);
+            if (idx > -1) currentBuiltSentence.splice(idx, 1);
+            checkOrderMatch();
+          };
+          slotContainer.appendChild(slotTile);
+          checkOrderMatch();
+        }
+      };
+      bankContainer.appendChild(tile);
+    });
+
+    const checkOrderMatch = () => {
+      if (currentBuiltSentence.length === this.currentExercise.correctOrder.length) {
+        const isExact = currentBuiltSentence.every((w, i) => w === this.currentExercise.correctOrder[i]);
+        this.selectedAnswer = { isCorrect: isExact };
+        UI.setCheckButtonState(true);
+      } else {
+        UI.setCheckButtonState(false);
+      }
+    };
+
+    container.appendChild(bankContainer);
+  },
+
+  checkAnswer() {
+    if (!this.selectedAnswer) return;
+    const isCorrect = this.selectedAnswer.isCorrect;
+
+    if (isCorrect) {
+      state.addXp(10);
+      UI.showFeedback(true, "ถูกต้อง! ยอดเยี่ยมมาก 🎉", this.currentExercise.explain);
+    } else {
+      state.decrementHp();
+      if (this.currentExercise.targetVocab) {
+        state.addMistake(this.currentExercise.targetVocab);
+      }
+      UI.showFeedback(false, "ยังไม่ถูกต้องนะ 💡", this.currentExercise.explain);
+    }
+  },
+
+  nextStep() {
+    UI.hideFeedback();
+    this.currentIndex++;
+    if (this.currentIndex < this.exercises.length) {
+      this.renderCurrentExercise();
+    } else {
+      // จบบทเรียน ปลดล็อกด่านและมอบรางวัล XP
+      state.addXp(25);
+      if (!state.completedLessons.includes(this.lesson.id)) {
+        state.completedLessons.push(this.lesson.id);
+        state.save();
+      }
+      alert(`🎉 ยินดีด้วย! คุณเรียนจบ "${this.lesson.title}" เรียบร้อยแล้ว ได้รับโบนัส +25 XP!`);
+      UI.renderHomeScreen();
+      UI.showScreen('screenHome');
+    }
+  }
+};
+
+// 5. VOCABULARY PRESENTATION RUNNER
+const VocabRunner = {
+  lesson: null,
+  currentIndex: 0,
+
+  start(lessonObj) {
+    this.lesson = lessonObj;
+    this.currentIndex = 0;
+    UI.showScreen('screenVocab');
+    this.renderCard();
+  },
+
+  renderCard() {
+    const item = this.lesson.words[this.currentIndex];
+    const total = this.lesson.words.length;
+
+    document.getElementById('vocabStepIndicator').innerText = `คำศัพท์ที่ ${this.currentIndex + 1}/${total}`;
+    document.getElementById('cardVocabType').innerText = item.type;
+    document.getElementById('cardVocabWord').innerText = item.word;
+    document.getElementById('cardVocabPhonetic').innerText = item.pinyin;
+    document.getElementById('cardVocabMeaning').innerText = item.meaning;
+    document.getElementById('cardExampleTarget').innerText = item.example;
+    document.getElementById('cardExampleTrans').innerText = item.exampleTrans;
+    document.getElementById('cardVocabUsageNote').innerText = `💡 ${item.note}`;
+
+    document.getElementById('btnPlayVocabAudio').onclick = () => {
+      AudioEngine.speak(item.word, APP_DATA[state.currentLang].speechCode);
+    };
+
+    document.getElementById('btnPrevVocab').style.visibility = this.currentIndex === 0 ? 'hidden' : 'visible';
+    document.getElementById('btnNextVocab').innerText = (this.currentIndex === total - 1) ? 'ไปทำแบบฝึกหัด ➔' : 'ถัดไป';
+  },
+
+  next() {
+    if (this.currentIndex < this.lesson.words.length - 1) {
+      this.currentIndex++;
+      this.renderCard();
+    } else {
+      QuizRunner.startLesson(this.lesson);
+    }
+  },
+
+  prev() {
+    if (this.currentIndex > 0) {
+      this.currentIndex--;
+      this.renderCard();
+    }
+  }
+};
+
+// 6. UI VIEW & EVENT HANDLERS
+const UI = {
+  init() {
+    this.bindEvents();
+    this.updateHeaderStats();
+    this.renderHomeScreen();
+    this.renderGrammarScreen();
+    this.updateMistakesNotice();
+  },
+
+  showScreen(screenId) {
+    document.querySelectorAll('main.screen').forEach(scr => scr.classList.add('hidden'));
+    const target = document.getElementById(screenId);
+    if (target) target.classList.remove('hidden');
+  },
+
+  setCheckButtonState(enabled) {
+    const btn = document.getElementById('btnCheckAnswer');
+    if (enabled) {
+      btn.classList.remove('btn-disabled');
+      btn.disabled = false;
+    } else {
+      btn.classList.add('btn-disabled');
+      btn.disabled = true;
+    }
+  },
+
+  showFeedback(isCorrect, title, message) {
+    const sheet = document.getElementById('feedbackSheet');
+    sheet.className = `feedback-sheet show ${isCorrect ? 'correct' : 'wrong'}`;
+    document.getElementById('feedbackTitle').innerText = title;
+    document.getElementById('feedbackExplanation').innerText = message;
+  },
+
+  hideFeedback() {
+    document.getElementById('feedbackSheet').classList.remove('show');
+  },
+
+  updateHeaderStats() {
+    document.getElementById('userHp').innerText = state.hp;
+    document.getElementById('userXp').innerText = state.xp;
+  },
+
+  updateMistakesNotice() {
+    const revCard = document.getElementById('reviewCard');
+    const count = state.mistakesList.length;
+    if (count > 0) {
+      revCard.classList.remove('hidden');
+      document.getElementById('mistakesCountLabel').innerText = `คุณมี ${count} คำศัพท์ที่ต้องฝึกซ้ำ`;
+    } else {
+      revCard.classList.add('hidden');
+    }
+  },
+
+  renderHomeScreen() {
+    const langData = APP_DATA[state.currentLang];
+    const defaultLesson = langData.lessons[0];
+
+    document.getElementById('currentLevelBadge').innerText = `${defaultLesson.level} • ${langData.standardName}`;
+    document.getElementById('currentLessonTitle').innerText = defaultLesson.title;
+    document.getElementById('currentLessonDesc').innerText = defaultLesson.desc;
+
+    // คำนวณความคืบหน้าของบทแรก
+    const isCompleted = state.completedLessons.includes(defaultLesson.id);
+    document.getElementById('homeProgressBar').style.width = isCompleted ? '100%' : '20%';
+    document.getElementById('homeProgressText').innerText = isCompleted ? 'เรียนจบแล้ว (ทบทวนได้)' : 'กำลังเรียน';
+
+    // รายการบทเรียนทั้งหมด
+    const listContainer = document.getElementById('lessonListContainer');
+    listContainer.innerHTML = '';
+
+    langData.lessons.forEach((les, idx) => {
+      const card = document.createElement('div');
+      const done = state.completedLessons.includes(les.id);
+      card.className = 'card';
+      card.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <span class="level-badge" style="background:#F2EDFF; color:var(--accent-lavender);">${les.level}</span>
+          <span>${done ? '✅ ผ่านแล้ว' : '🔓 พร้อมเรียน'}</span>
+        </div>
+        <h4 style="font-size:1.05rem; font-weight:700; margin: 4px 0;">${les.title}</h4>
+        <p style="font-size:0.8rem; color:var(--text-muted);">${les.desc}</p>
+      `;
+      card.onclick = () => VocabRunner.start(les);
+      listContainer.appendChild(card);
+    });
+  },
+
+  renderGrammarScreen() {
+    const langData = APP_DATA[state.currentLang];
+    const gList = document.getElementById('grammarContentList');
+    gList.innerHTML = '';
+
+    langData.grammar.forEach(g => {
+      const el = document.createElement('div');
+      el.className = 'grammar-card';
+      el.innerHTML = `
+        <span class="level-badge" style="background:#FFF1E8; color:var(--primary);">${g.level}</span>
+        <h3 style="font-size:1rem; font-weight:700; margin: 4px 0 8px;">${g.title}</h3>
+        <p style="font-size:0.85rem; color:var(--text-dark); margin-bottom:8px;">${g.explanation}</p>
+        <div class="ex-comp">
+          <div class="correct-tag">✔️ ตัวอย่างถูก: ${g.correctExample}</div>
+          <div class="wrong-tag">❌ ตัวอย่างผิด: ${g.wrongExample}</div>
+        </div>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:8px;">💡 คำแนะนำ: ${g.tip}</p>
+      `;
+      gList.appendChild(el);
+    });
+  },
+
+  bindEvents() {
+    // สลับภาษา จีน / อังกฤษ
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.currentLang = btn.dataset.lang;
+        state.save();
+        this.renderHomeScreen();
+        this.renderGrammarScreen();
+      };
+    });
+
+    // ปุ่มเรียนต่อหน้าแรก
+    document.getElementById('btnContinuePlay').onclick = () => {
+      const targetLesson = APP_DATA[state.currentLang].lessons[0];
+      VocabRunner.start(targetLesson);
+    };
+
+    // ปุ่มในชุดเรียนคำศัพท์ Flashcard
+    document.getElementById('btnNextVocab').onclick = () => VocabRunner.next();
+    document.getElementById('btnPrevVocab').onclick = () => VocabRunner.prev();
+    document.getElementById('btnSkipToQuiz').onclick = () => QuizRunner.startLesson(VocabRunner.lesson);
+
+    // ปุ่มตรวจคำตอบและปุ่มข้ามคำตอบใน Feedback
+    document.getElementById('btnCheckAnswer').onclick = () => QuizRunner.checkAnswer();
+    document.getElementById('btnFeedbackContinue').onclick = () => QuizRunner.nextStep();
+    document.getElementById('btnCloseQuiz').onclick = () => {
+      if (confirm('คุณต้องการออกจากการทำแบบฝึกหัดหรือไม่?')) {
+        UI.showScreen('screenHome');
+      }
+    };
+
+    // ระบบทบทวนคำผิด
+    document.getElementById('btnStartMistakesReview').onclick = () => {
+      if (state.mistakesList.length === 0) return;
+      const reviewLesson = {
+        id: "review_custom",
+        level: "ทบทวน",
+        title: "คลังทบทวนคำศัพท์ที่ตอบผิด",
+        desc: "ฝึกฝนซ้ำจนกว่าจะเชี่ยวชาญ",
+        words: [...state.mistakesList]
+      };
+      QuizRunner.startLesson(reviewLesson);
+    };
+
+    // แถบเมนูด้านล่าง (Bottom Navigation)
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.onclick = () => {
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        item.classList.add('active');
+        const targetScreen = item.dataset.target;
+        UI.showScreen(targetScreen);
+      };
+    });
+  }
+};
+
+// เริ่มต้นรันระบบเมื่อโหลดเอกสารเสร็จสมบูรณ์
+window.addEventListener('DOMContentLoaded', () => {
+  UI.init();
+});
+</script>
+</body>
+</html>
